@@ -53,8 +53,16 @@ const ProductCard = ({ product }) => {
 };
 
 const styles = {
-    card: { backgroundColor: '#fff', borderRadius: '12px', width: '280px', overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.05)', display: 'flex', flexDirection: 'column', border: '1px solid #f1f5f9' },
-    imageContainer: { position: 'relative', height: '180px', overflow: 'hidden' },
+    card: {
+        backgroundColor: '#fff',
+        borderRadius: '12px',
+        height: '100%', // <-- O segredo do alinhamento vertical
+        overflow: 'hidden',
+        boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
+        display: 'flex',
+        flexDirection: 'column',
+        border: '1px solid #f1f5f9'
+    },    imageContainer: { position: 'relative', height: '180px', overflow: 'hidden' },
     imageBackground: { width: '100%', height: '100%', backgroundColor: '#f8fafc', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '10px' },
     image: { maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' },
     categoryBadge: { position: 'absolute', top: '10px', left: '10px', backgroundColor: '#1e293b', color: 'white', padding: '4px 8px', borderRadius: '4px', fontSize: '0.65rem', fontWeight: 'bold' },
