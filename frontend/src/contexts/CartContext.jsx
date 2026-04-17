@@ -1,10 +1,22 @@
 // frontend/src/contexts/CartContext.jsx
-import React, { createContext, useState, useMemo } from 'react';
+import React, { createContext, useState, useMemo, useEffect } from 'react';
 
 export const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
-    const [cart, setCart] = useState([]);
+    // 1. Inicializa o estado lendo do LocalStorage (se existir)
+    const [cart, setCart] = useState(() => {
+        const savedCart = localStorage.getItem('@TennisMarket:cart');
+        if (savedCart) {
+            return JSON.parse(savedCart);
+        }
+        return [];
+    });
+
+    // 2. Sempre que o carrinho mudar, salva a nova versão no LocalStorage
+    useEffect(() => {
+        localStorage.setItem('@TennisMarket:cart', JSON.stringify(cart));
+    }, [cart]);
 
     const addToCart = (product, quantity = 1) => {
         setCart(prevCart => {
@@ -34,12 +46,18 @@ export const CartProvider = ({ children }) => {
         }));
     };
 
+    // 3. Nova função para limpar o carrinho após a compra
+    const clearCart = () => {
+        setCart([]);
+        localStorage.removeItem('@TennisMarket:cart');
+    };
+
     const cartTotal = useMemo(() => {
         return cart.reduce((total, item) => total + (item.price * item.quantity), 0);
     }, [cart]);
 
     return (
-        <CartContext.Provider value={{ cart, addToCart, removeFromCart, updateQuantity, cartTotal }}>
+        <CartContext.Provider value={{ cart, addToCart, removeFromCart, updateQuantity, clearCart, cartTotal }}>
             {children}
         </CartContext.Provider>
     );

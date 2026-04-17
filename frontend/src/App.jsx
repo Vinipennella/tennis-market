@@ -1,24 +1,37 @@
 // frontend/src/App.jsx
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react'; // Adicione o useContext aqui
 import Home from './pages/Home';
 import Header from './components/Header';
 import Report from './pages/Report';
+import { CartContext } from './contexts/CartContext'; // Importe o contexto
 
 function App() {
   const [statusMessage, setStatusMessage] = useState(null);
   const [currentView, setCurrentView] = useState('loja');
 
+  // Puxa a função de limpar do contexto
+  const { clearCart } = useContext(CartContext);
+
   useEffect(() => {
     const query = new URLSearchParams(window.location.search);
-    if (query.get("success")) setStatusMessage({ type: 'success', text: "Pagamento aprovado! Seu pedido já está sendo separado." });
-    if (query.get("canceled")) setStatusMessage({ type: 'warning', text: "Compra cancelada. O carrinho foi mantido." });
+
+    if (query.get("success")) {
+      setStatusMessage({ type: 'success', text: "Pagamento aprovado! Seu pedido já está sendo separado." });
+      clearCart(); // Limpa a sacola porque a compra deu certo
+    }
+
+    if (query.get("canceled")) {
+      setStatusMessage({ type: 'warning', text: "Compra cancelada. O carrinho foi mantido." });
+      // Não chamamos o clearCart aqui, pois a pessoa pode querer tentar pagar de novo
+    }
 
     if (query.get("success") || query.get("canceled")) {
       window.history.replaceState({}, document.title, "/");
     }
-  }, []);
+  }, []); // Mantemos o array vazio para rodar apenas quando a página carregar
 
   return (
+
     // Fundo cinza bem moderno (#e2e8f0) em vez do branco absoluto
     <div style={{ fontFamily: '"Inter", "Segoe UI", sans-serif', backgroundColor: '#e2e8f0', minHeight: '100vh', paddingBottom: '60px' }}>
       <Header />
