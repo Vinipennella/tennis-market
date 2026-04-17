@@ -24,8 +24,8 @@ const Report = () => {
 
     return (
         <div style={{ padding: '20px', maxWidth: '1000px', margin: '0 auto' }}>
-            <h2 style={{ color: '#2c3e50', borderBottom: '2px solid #eaeaea', paddingBottom: '10px' }}>
-                📊 Relatório Gerencial de Vendas
+            <h2 style={{ color: '#0f172a', borderBottom: '1px solid #e2e8f0', paddingBottom: '16px', fontSize: '1.5rem', fontWeight: '600' }}>
+                Relatório Gerencial de Vendas
             </h2>
 
             <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '20px', backgroundColor: '#fff', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}>

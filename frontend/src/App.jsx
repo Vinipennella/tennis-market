@@ -43,15 +43,22 @@ function App() {
           </div>
         </div>
 
-        {/* Alerta de Status Flutuante */}
+        {/* Alerta de Status Flutuante Limpo */}
         {statusMessage && (
           <div style={{
             ...styles.alertBanner,
-            backgroundColor: statusMessage.type === 'success' ? '#edf7ed' : '#fff4e5',
-            color: statusMessage.type === 'success' ? '#1e4620' : '#663c00',
-            borderLeft: `4px solid ${statusMessage.type === 'success' ? '#4caf50' : '#ff9800'}`
+            backgroundColor: statusMessage.type === 'success' ? '#f0fdf4' : '#fffbeb',
+            color: statusMessage.type === 'success' ? '#166534' : '#92400e',
+            border: `1px solid ${statusMessage.type === 'success' ? '#bbf7d0' : '#fef3c7'}`
           }}>
-            <strong>{statusMessage.type === 'success' ? '✅ Sucesso:' : '⚠️ Atenção:'}</strong> {statusMessage.text}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              {statusMessage.type === 'success' ? (
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+              ) : (
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+              )}
+              <span><strong style={{ fontWeight: 600 }}>{statusMessage.type === 'success' ? 'Sucesso: ' : 'Atenção: '}</strong> {statusMessage.text}</span>
+            </div>
           </div>
         )}
 
