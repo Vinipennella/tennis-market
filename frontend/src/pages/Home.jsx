@@ -6,10 +6,11 @@ import ProductCard from '../components/ProductCard';
 const Home = () => {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
-
-    // Novos estados para busca e filtro
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('Todas');
+
+    // Novo estado para ordenação
+    const [sortOrder, setSortOrder] = useState('featured');
 
     useEffect(() => {
         const loadProducts = async () => {
@@ -25,32 +26,54 @@ const Home = () => {
         loadProducts();
     }, []);
 
-    // Extrai as categorias únicas automaticamente dos produtos que vierem do banco
     const categories = ['Todas', ...new Set(products.map(p => p.category))];
 
-    // Lógica de filtragem
-    const filteredProducts = products.filter(product => {
+    // 1. Filtragem (Busca + Categoria)
+    const filtered = products.filter(product => {
         const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase());
         const matchesCategory = selectedCategory === 'Todas' || product.category === selectedCategory;
         return matchesSearch && matchesCategory;
     });
 
-    if (loading) return <div style={styles.loading}>Carregando catálogo...</div>;
+    // 2. Ordenação (Aplicada sobre o resultado filtrado)
+    const sortedProducts = [...filtered].sort((a, b) => {
+        if (sortOrder === 'price-low') return a.price - b.price;
+        if (sortOrder === 'price-high') return b.price - a.price;
+        if (sortOrder === 'name') return a.name.localeCompare(b.name);
+        return 0; // 'featured' ou padrão
+    });
+
+    if (loading) return <div style={styles.loading}>A carregar catálogo...</div>;
 
     return (
         <div style={styles.container}>
 
-            {/* Seção de Busca e Filtros */}
             <div style={styles.filterSection}>
-                <div style={styles.searchWrapper}>
-                    <svg style={styles.searchIcon} width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                    <input
-                        type="text"
-                        placeholder="Buscar raquetes, tênis, cordas..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        style={styles.searchInput}
-                    />
+                <div style={styles.topFilters}>
+                    <div style={styles.searchWrapper}>
+                        <svg style={styles.searchIcon} width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                        <input
+                            type="text"
+                            placeholder="O que procura hoje?"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            style={styles.searchInput}
+                        />
+                    </div>
+
+                    <div style={styles.sortWrapper}>
+                        <label style={styles.sortLabel}>Ordenar por:</label>
+                        <select
+                            style={styles.select}
+                            value={sortOrder}
+                            onChange={(e) => setSortOrder(e.target.value)}
+                        >
+                            <option value="featured">Destaques</option>
+                            <option value="price-low">Menor Preço</option>
+                            <option value="price-high">Maior Preço</option>
+                            <option value="name">Nome (A-Z)</option>
+                        </select>
+                    </div>
                 </div>
 
                 <div style={styles.categoriesWrapper}>
@@ -69,12 +92,11 @@ const Home = () => {
                 </div>
             </div>
 
-            {/* Grade de Produtos Corrigida */}
-            {filteredProducts.length === 0 ? (
-                <div style={styles.emptyState}>Nenhum produto encontrado para sua busca.</div>
+            {sortedProducts.length === 0 ? (
+                <div style={styles.emptyState}>Nenhum produto encontrado.</div>
             ) : (
                 <div style={styles.grid}>
-                    {filteredProducts.map((product) => (
+                    {sortedProducts.map((product) => (
                         <ProductCard key={product.id} product={product} />
                     ))}
                 </div>
@@ -85,77 +107,67 @@ const Home = () => {
 
 const styles = {
     container: { paddingBottom: '40px' },
-    loading: { textAlign: 'center', marginTop: '50px', color: '#64748b', fontSize: '1.2rem' },
-
-    // Estilos da Barra de Busca e Filtros
+    loading: { textAlign: 'center', marginTop: '50px', color: '#64748b' },
     filterSection: {
         backgroundColor: '#fff',
-        padding: '20px',
+        padding: '24px',
         borderRadius: '12px',
-        boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
         marginBottom: '32px',
         display: 'flex',
         flexDirection: 'column',
-        gap: '16px',
-        border: '1px solid #f1f5f9'
+        gap: '20px',
+        border: '1px solid #e2e8f0'
     },
-    searchWrapper: {
-        position: 'relative',
+    topFilters: {
         display: 'flex',
-        alignItems: 'center'
-    },
-    searchIcon: {
-        position: 'absolute',
-        left: '16px'
-    },
-    searchInput: {
-        width: '100%',
-        padding: '14px 14px 14px 44px',
-        borderRadius: '8px',
-        border: '1px solid #e2e8f0',
-        fontSize: '1rem',
-        color: '#0f172a',
-        backgroundColor: '#f8fafc',
-        outline: 'none',
-        transition: 'border-color 0.2s, box-shadow 0.2s'
-    },
-    categoriesWrapper: {
-        display: 'flex',
-        gap: '10px',
+        gap: '20px',
+        alignItems: 'center',
+        justifyContent: 'space-between',
         flexWrap: 'wrap'
     },
-    categoryBtn: {
-        padding: '8px 16px',
-        borderRadius: '20px',
+    searchWrapper: { position: 'relative', flex: 1, minWidth: '300px' },
+    searchIcon: { position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)' },
+    searchInput: {
+        width: '100%',
+        padding: '12px 12px 12px 42px',
+        borderRadius: '8px',
+        border: '1px solid #e2e8f0',
+        backgroundColor: '#f8fafc',
+        fontSize: '0.95rem',
+        outline: 'none'
+    },
+    sortWrapper: { display: 'flex', alignItems: 'center', gap: '10px' },
+    sortLabel: { fontSize: '0.85rem', color: '#64748b', fontWeight: '500' },
+    select: {
+        padding: '10px',
+        borderRadius: '8px',
         border: '1px solid #e2e8f0',
         backgroundColor: '#fff',
-        color: '#475569',
+        fontSize: '0.9rem',
+        color: '#0f172a',
+        cursor: 'pointer',
+        outline: 'none'
+    },
+    categoriesWrapper: { display: 'flex', gap: '8px', flexWrap: 'wrap' },
+    categoryBtn: {
+        padding: '8px 16px',
+        borderRadius: '8px',
+        border: '1px solid #e2e8f0',
+        backgroundColor: '#fff',
+        color: '#64748b',
         fontSize: '0.85rem',
         fontWeight: '600',
-        cursor: 'pointer',
-        transition: 'all 0.2s ease'
+        cursor: 'pointer'
     },
-    categoryBtnActive: {
-        backgroundColor: '#0f172a',
-        color: '#fff',
-        borderColor: '#0f172a'
-    },
-    emptyState: {
-        textAlign: 'center',
-        padding: '40px',
-        color: '#64748b',
-        backgroundColor: '#fff',
-        borderRadius: '12px',
-        border: '1px dashed #cbd5e1'
-    },
-
-    // A MÁGICA DO ALINHAMENTO ESTÁ AQUI NA GRADE
+    categoryBtnActive: { backgroundColor: '#1e293b', color: '#fff', borderColor: '#1e293b' },
     grid: {
         display: 'grid',
         gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
         gap: '24px',
-        alignItems: 'stretch' // Garante que todos os cards na mesma linha tenham a mesma altura
-    }
+        alignItems: 'stretch'
+    },
+    emptyState: { textAlign: 'center', padding: '60px', color: '#94a3b8', backgroundColor: '#fff', borderRadius: '12px' }
 };
 
 export default Home;
