@@ -1,14 +1,18 @@
 // frontend/src/components/ProductCard.jsx
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { CartContext } from '../contexts/CartContext';
 
 const ProductCard = ({ product }) => {
     const { addToCart } = useContext(CartContext);
+    const [quantity, setQuantity] = useState(1);
+
+    const adjustQty = (val) => {
+        if (quantity + val >= 1) setQuantity(prev => prev + val);
+    };
 
     return (
         <div style={styles.card}>
             <div style={styles.imageContainer}>
-                {/* Adicionamos um fundo leve para preencher o espaço vazio ao redor da raquete */}
                 <div style={styles.imageBackground}>
                     <img src={product.image} alt={product.name} style={styles.image} />
                 </div>
@@ -20,18 +24,28 @@ const ProductCard = ({ product }) => {
                 <p style={styles.description}>{product.description}</p>
 
                 <div style={styles.footer}>
-                    <div style={styles.priceContainer}>
-                        <span style={styles.currency}>R$</span>
-                        <span style={styles.priceValue}>{product.price.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                    <div style={styles.qtyContainer}>
+                        <button onClick={() => adjustQty(-1)} style={styles.qtyBtn}>-</button>
+                        <span style={styles.qtyValue}>{quantity}</span>
+                        <button onClick={() => adjustQty(1)} style={styles.qtyBtn}>+</button>
                     </div>
-                    <button
-                        style={styles.button}
-                        onClick={() => addToCart(product)}
-                        onMouseOver={(e) => e.target.style.backgroundColor = '#1e7e34'}
-                        onMouseOut={(e) => e.target.style.backgroundColor = '#28a745'}
-                    >
-                        Comprar
-                    </button>
+
+                    <div style={styles.buyArea}>
+                        <div style={styles.priceContainer}>
+                            <span style={styles.priceValue}>
+                                {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(product.price * quantity)}
+                            </span>
+                        </div>
+                        <button
+                            style={styles.button}
+                            onClick={() => {
+                                addToCart(product, quantity);
+                                setQuantity(1); // Reseta para 1 após adicionar
+                            }}
+                        >
+                            Adicionar
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -39,108 +53,21 @@ const ProductCard = ({ product }) => {
 };
 
 const styles = {
-    card: {
-        backgroundColor: '#fff',
-        borderRadius: '12px',
-        width: '280px',
-        overflow: 'hidden',
-        boxShadow: '0 8px 24px rgba(149, 157, 165, 0.1)', // Sombra mais suave
-        transition: 'transform 0.2s ease',
-        display: 'flex',
-        flexDirection: 'column',
-        border: '1px solid #f0f0f0'
-    },
-    imageContainer: {
-        position: 'relative',
-        height: '200px', // Aumentamos um pouco a altura para acomodar melhor a raquete inteira
-        overflow: 'hidden',
-        borderBottom: '1px solid #f0f0f0'
-    },
-    imageBackground: {
-        width: '100%',
-        height: '100%',
-        backgroundColor: '#fbfbfb', // Um cinza quase branco para preencher as laterais
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: '10px' // Um pequeno respiro para a raquete não encostar nas bordas
-    },
-    image: {
-        maxWidth: '100%',
-        maxHeight: '100%',
-        // A MÁGICA ESTÁ AQUI: 'contain' garante que a imagem inteira apareça, sem cortes.
-        objectFit: 'contain'
-    },
-    categoryBadge: {
-        position: 'absolute',
-        top: '10px',
-        left: '10px',
-        backgroundColor: 'rgba(44, 62, 80, 0.9)', // Mais opaco para leitura
-        color: 'white',
-        padding: '4px 8px',
-        borderRadius: '4px',
-        fontSize: '0.65rem',
-        fontWeight: 'bold',
-        textTransform: 'uppercase',
-        letterSpacing: '0.5px'
-    },
-    info: {
-        padding: '16px',
-        display: 'flex',
-        flexDirection: 'column',
-        flexGrow: 1
-    },
-    title: {
-        fontSize: '0.95rem',
-        fontWeight: '700',
-        color: '#333',
-        margin: '0 0 8px 0',
-        minHeight: '40px', // Garante alinhamento mesmo com títulos curtos
-        lineHeight: '1.3'
-    },
-    description: {
-        fontSize: '0.8rem',
-        color: '#777',
-        lineHeight: '1.4',
-        marginBottom: '16px',
-        flexGrow: 1,
-        minHeight: '45px' // Mantém o botão de comprar alinhado
-    },
-    footer: {
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        borderTop: '1px solid #f0f0f0',
-        paddingTop: '12px',
-        marginTop: 'auto' // Empurra o rodapé para o final do card
-    },
-    priceContainer: {
-        display: 'flex',
-        flexDirection: 'column'
-    },
-    currency: {
-        fontSize: '0.65rem',
-        color: '#888',
-        fontWeight: 'bold',
-        marginBottom: '-2px'
-    },
-    priceValue: {
-        fontSize: '1.15rem',
-        fontWeight: '800',
-        color: '#2c3e50'
-    },
-    button: {
-        backgroundColor: '#28a745',
-        color: 'white',
-        border: 'none',
-        padding: '10px 18px',
-        borderRadius: '6px',
-        cursor: 'pointer',
-        fontWeight: 'bold',
-        fontSize: '0.85rem',
-        transition: 'all 0.2s ease',
-        boxShadow: '0 2px 4px rgba(40, 167, 69, 0.2)'
-    }
+    card: { backgroundColor: '#fff', borderRadius: '12px', width: '280px', overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.05)', display: 'flex', flexDirection: 'column', border: '1px solid #f1f5f9' },
+    imageContainer: { position: 'relative', height: '180px', overflow: 'hidden' },
+    imageBackground: { width: '100%', height: '100%', backgroundColor: '#f8fafc', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '10px' },
+    image: { maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' },
+    categoryBadge: { position: 'absolute', top: '10px', left: '10px', backgroundColor: '#1e293b', color: 'white', padding: '4px 8px', borderRadius: '4px', fontSize: '0.65rem', fontWeight: 'bold' },
+    info: { padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px' },
+    title: { fontSize: '0.9rem', fontWeight: '700', color: '#0f172a', margin: 0, minHeight: '38px' },
+    description: { fontSize: '0.75rem', color: '#64748b', margin: 0, minHeight: '32px' },
+    footer: { display: 'flex', flexDirection: 'column', gap: '12px', borderTop: '1px solid #f1f5f9', paddingTop: '12px' },
+    qtyContainer: { display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', backgroundColor: '#f8fafc', borderRadius: '6px', padding: '4px' },
+    qtyBtn: { background: 'none', border: 'none', fontSize: '1.2rem', color: '#64748b', cursor: 'pointer', padding: '0 10px' },
+    qtyValue: { fontSize: '0.9rem', fontWeight: '600', color: '#0f172a', minWidth: '20px', textAlign: 'center' },
+    buyArea: { display: 'flex', justifyContent: 'space-between', alignItems: 'center' },
+    priceValue: { fontSize: '1rem', fontWeight: '700', color: '#0f172a' },
+    button: { backgroundColor: '#0f172a', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', fontSize: '0.8rem' }
 };
 
 export default ProductCard;
