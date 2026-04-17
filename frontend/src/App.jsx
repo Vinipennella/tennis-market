@@ -13,19 +13,18 @@ function App() {
     if (query.get("success")) setStatusMessage({ type: 'success', text: "Pagamento aprovado! Seu pedido já está sendo separado." });
     if (query.get("canceled")) setStatusMessage({ type: 'warning', text: "Compra cancelada. O carrinho foi mantido." });
 
-    // Limpa a URL para o visual ficar mais limpo
     if (query.get("success") || query.get("canceled")) {
       window.history.replaceState({}, document.title, "/");
     }
   }, []);
 
   return (
-    <div style={{ fontFamily: '"Inter", "Segoe UI", sans-serif', backgroundColor: '#f5f7f9', minHeight: '100vh', paddingBottom: '40px' }}>
+    // Fundo cinza bem moderno (#e2e8f0) em vez do branco absoluto
+    <div style={{ fontFamily: '"Inter", "Segoe UI", sans-serif', backgroundColor: '#e2e8f0', minHeight: '100vh', paddingBottom: '60px' }}>
       <Header />
 
       <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 20px' }}>
 
-        {/* Navegação em Tabs Modernas */}
         <div style={styles.navContainer}>
           <div style={styles.tabsWrapper}>
             <button
@@ -43,7 +42,6 @@ function App() {
           </div>
         </div>
 
-        {/* Alerta de Status Flutuante Limpo */}
         {statusMessage && (
           <div style={{
             ...styles.alertBanner,
@@ -62,7 +60,7 @@ function App() {
           </div>
         )}
 
-        <main style={{ marginTop: '20px' }}>
+        <main style={{ marginTop: '30px' }}>
           {currentView === 'loja' ? <Home /> : <Report />}
         </main>
 
@@ -75,32 +73,33 @@ const styles = {
   navContainer: {
     display: 'flex',
     justifyContent: 'center',
-    margin: '30px 0 20px 0'
+    margin: '40px 0 30px 0'
   },
   tabsWrapper: {
-    backgroundColor: '#e9ecef',
-    padding: '4px',
+    backgroundColor: '#cbd5e1', // Cinza médio para o contêiner das abas
+    padding: '6px',
     borderRadius: '12px',
     display: 'inline-flex',
-    gap: '4px'
+    gap: '6px',
+    boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.06)' // Sombra interna para dar profundidade
   },
   tab: {
-    padding: '10px 24px',
+    padding: '10px 28px',
     borderRadius: '8px',
     border: 'none',
     fontWeight: '600',
-    fontSize: '0.9rem',
+    fontSize: '0.95rem',
     cursor: 'pointer',
     transition: 'all 0.2s ease',
   },
   activeTab: {
     backgroundColor: '#ffffff',
-    color: '#2c3e50',
-    boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
+    color: '#0f172a',
+    boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' // Sombra para parecer que o botão está levantado
   },
   inactiveTab: {
     backgroundColor: 'transparent',
-    color: '#6c757d'
+    color: '#475569' // Cinza escuro para abas não selecionadas
   },
   alertBanner: {
     padding: '16px 20px',
