@@ -6,8 +6,12 @@ const ProductCard = ({ product }) => {
     const { addToCart } = useContext(CartContext);
     const [quantity, setQuantity] = useState(1);
 
+    const stock = product.stock ?? null;
+    const outOfStock = stock !== null && stock === 0;
+
     const adjustQty = (val) => {
-        if (quantity + val >= 1) setQuantity(prev => prev + val);
+        const next = quantity + val;
+        if (next >= 1 && (stock === null || next <= stock)) setQuantity(next);
     };
 
     return (
@@ -23,11 +27,17 @@ const ProductCard = ({ product }) => {
                 <h3 style={styles.title}>{product.name}</h3>
                 <p style={styles.description}>{product.description}</p>
 
+                {stock !== null && (
+                    <span style={{ ...styles.stockLabel, color: outOfStock ? '#ef4444' : stock <= 5 ? '#f59e0b' : '#22c55e' }}>
+                        {outOfStock ? 'Sem estoque' : `Estoque: ${stock}`}
+                    </span>
+                )}
+
                 <div style={styles.footer}>
                     <div style={styles.qtyContainer}>
-                        <button onClick={() => adjustQty(-1)} style={styles.qtyBtn}>-</button>
+                        <button onClick={() => adjustQty(-1)} style={styles.qtyBtn} disabled={quantity <= 1}>-</button>
                         <span style={styles.qtyValue}>{quantity}</span>
-                        <button onClick={() => adjustQty(1)} style={styles.qtyBtn}>+</button>
+                        <button onClick={() => adjustQty(1)} style={styles.qtyBtn} disabled={stock !== null && quantity >= stock}>+</button>
                     </div>
 
                     <div style={styles.buyArea}>
@@ -37,13 +47,14 @@ const ProductCard = ({ product }) => {
                             </span>
                         </div>
                         <button
-                            style={styles.button}
+                            style={{ ...styles.button, backgroundColor: outOfStock ? '#94a3b8' : '#0f172a', cursor: outOfStock ? 'not-allowed' : 'pointer' }}
+                            disabled={outOfStock}
                             onClick={() => {
                                 addToCart(product, quantity);
-                                setQuantity(1); // Reseta para 1 após adicionar
+                                setQuantity(1);
                             }}
                         >
-                            Adicionar
+                            {outOfStock ? 'Esgotado' : 'Adicionar'}
                         </button>
                     </div>
                 </div>
@@ -69,6 +80,7 @@ const styles = {
     info: { padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px' },
     title: { fontSize: '0.9rem', fontWeight: '700', color: '#0f172a', margin: 0, minHeight: '38px' },
     description: { fontSize: '0.75rem', color: '#64748b', margin: 0, minHeight: '32px' },
+    stockLabel: { fontSize: '0.72rem', fontWeight: '600' },
     footer: { display: 'flex', flexDirection: 'column', gap: '12px', borderTop: '1px solid #f1f5f9', paddingTop: '12px' },
     qtyContainer: { display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', backgroundColor: '#f8fafc', borderRadius: '6px', padding: '4px' },
     qtyBtn: { background: 'none', border: 'none', fontSize: '1.2rem', color: '#64748b', cursor: 'pointer', padding: '0 10px' },

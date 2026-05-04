@@ -45,9 +45,9 @@ const CartModal = ({ isOpen, onClose }) => {
 
                                 <div style={styles.itemActions}>
                                     <div style={styles.qtyControls}>
-                                        <button onClick={() => updateQuantity(item.id, -1)} style={styles.actionBtn}>-</button>
+                                        <button onClick={() => updateQuantity(item.id, -1)} style={styles.actionBtn} disabled={item.quantity <= 1}>-</button>
                                         <span style={styles.qtyLabel}>{item.quantity}</span>
-                                        <button onClick={() => updateQuantity(item.id, 1)} style={styles.actionBtn}>+</button>
+                                        <button onClick={() => updateQuantity(item.id, 1)} style={styles.actionBtn} disabled={item.stock != null && item.quantity >= item.stock}>+</button>
                                     </div>
 
                                     <button onClick={() => removeFromCart(item.id)} style={styles.removeBtn}>

@@ -22,13 +22,16 @@ export const CartProvider = ({ children }) => {
         setCart(prevCart => {
             const existingItem = prevCart.find(item => item.id === product.id);
             if (existingItem) {
+                const maxQty = product.stock ?? Infinity;
+                const newQty = Math.min(existingItem.quantity + quantity, maxQty);
                 return prevCart.map(item =>
                     item.id === product.id
-                        ? { ...item, quantity: item.quantity + quantity }
+                        ? { ...item, quantity: newQty }
                         : item
                 );
             }
-            return [...prevCart, { ...product, quantity }];
+            const cappedQty = product.stock != null ? Math.min(quantity, product.stock) : quantity;
+            return [...prevCart, { ...product, quantity: cappedQty }];
         });
     };
 
@@ -40,7 +43,8 @@ export const CartProvider = ({ children }) => {
         setCart(prevCart => prevCart.map(item => {
             if (item.id === productId) {
                 const newQty = item.quantity + delta;
-                return { ...item, quantity: newQty > 0 ? newQty : 1 };
+                const maxQty = item.stock ?? Infinity;
+                return { ...item, quantity: Math.min(Math.max(newQty, 1), maxQty) };
             }
             return item;
         }));
